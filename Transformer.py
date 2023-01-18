@@ -3,32 +3,32 @@ import torch as tn
 from torch import nn
 from torch.nn import functional as F
 
-class Net(nn.Module):
-    def __init__(self,T,D):
+
+
+
+# Embed(Vocabsize, embeddim) - 
+# 
+
+
+class Transformer(nn.Module):
+    def __init__(self):
         super().__init__()
-        self.mht_d1 = nn.MultiheadAttention((T,D),10)
-        self.lnorm = nn.LayerNorm((T,D))
+        self.Transformer = nn.Transformer(d_model=300,nhead=10,num_encoder_layers=6,num_decoder_layers=6,dim_feedforward=2048,dropout=0.1,activation='relu')
+        self.Linear = nn.Linear(25*300,204)
+        self.Softmax = nn.Softmax(dim=204)
 
 
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=5)
-        self.fc1 = nn.Linear(256, 200)
-        self.fc2 = nn.Linear(200, 10)
     def forward(self, X):
-        X = self.mht_d1(X)
-        return x
+        X = self.Transformer(X)
+        X.reshape(-1,25*300)
+        X = self.Linear(X)
+        X = self.Softmax(X)
 
 
-# %%
 
-X = tn.ones((100,100,10))
 
-m = nn.Linear(10,out_features=20,bias=False)
+        return X
 
-m(X)
-# %%
-nn.MultiheadAttention()
-
-nn.Transformer()
 
 
 # %%
