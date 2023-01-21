@@ -1,78 +1,73 @@
 #%%
-
-import torch as tn
-from torchtext import vocab
-import pickle
-
-
-vec_GloVe = vocab.GloVe(name='840B', dim=300)
-
 from helper import load_data
+from torchtext.data.utils import get_tokenizer
+from torchtext import vocab
 # Load English data
 english_sentences = load_data('data/small_vocab_en')
 # Load French data
 french_sentences = load_data('data/small_vocab_fr')
 
+# Remove the last sentence from the dataset (it's incomplete)
+english_sentences.pop()
+french_sentences.pop()
 
-#%%
-from torchtext.data.utils import get_tokenizer
-
+# Tokenize the sentences
 tokenizer = get_tokenizer('basic_english')
 
 english_sentences = [tokenizer(sentence) for sentence in english_sentences]
 french_sentences = [tokenizer(sentence) for sentence in french_sentences]
 
-english_sentences.pop()
-french_sentences.pop()
+# Add the start and end tokens to the sentences
+Transformer_prediction = [["<Start>"],["<Pad>"],["<End>"]]
 
-max = 0 
+# Define the vocabulary for the English and French datasets
+Vocab_en = vocab.build_vocab_from_iterator(english_sentences + Transformer_prediction, min_freq = 1, special_first = True)
+Vocab_fr = vocab.build_vocab_from_iterator(french_sentences + Transformer_prediction, min_freq = 1, special_first = True)
+
+# Max length of the sentences
+max_len = max([max([len(sentence) for sentence in english_sentences]),max([len(sentence) for sentence in french_sentences])]) + 2 # for Padding and End tokens
+
+
+# Create the list of padded sentences
+Paddings_en = []
+Paddings_fr = []
+
+# Add the start and end tokens to the sentences
 for sentence_en,sentence_fr in zip(english_sentences,french_sentences):
-    if len(sentence_en) > max:
-        max = len(sentence_en)
-    if len(sentence_fr) > max:
-        max = len(sentence_fr)
 
-print(max)
-#%%
-N = len(english_sentences)
+    # Add the start and end tokens to the sentences
+    sentence_en.insert(0,"<Start>")
+    sentence_fr.insert(0,"<Start>")
+    sentence_en.append("<End>")
+    sentence_fr.append("<End>")
 
-X = tn.zeros((N,25,300))
-Y = tn.zeros((N,25,300))
-
-idx =0
-error_idx = []
-for english_sentence, french_sentence in zip(english_sentences, french_sentences):
-    
-    n_sentence_en = len(english_sentence)
-    n_sentence_fr = len(french_sentence)
-
-
-    Y[idx,:n_sentence_en:] = vec_GloVe.get_vecs_by_tokens(english_sentence)
-    X[idx,:n_sentence_fr,:] = vec_GloVe.get_vecs_by_tokens(french_sentence)
-
-    idx += 1
-#%%
-
-X_train = X[:10000]
-Y_train = Y[:10000]
-X_vali = X[10001:12000]
-Y_vali = Y[10001:12000]
-X_test = X[12001:]
-Y_test = Y[12001:]
+    # Pad the sentences
+    if len(sentence_en) < max_len:
+        Paddings_en.append(max_len-len(sentence_en))
+        sentence_en += ["<Pad>"]*(max_len-len(sentence_en))
+        
+    if len(sentence_fr) < max_len:
+        Paddings_fr.append(max_len-len(sentence_fr))
+        sentence_fr += ["<Pad>"]*(max_len-len(sentence_fr))
+        
+# Encode the sentences according to the vocabulary
+english_encodings = [Vocab_en.lookup_indices(sentence) for sentence in english_sentences]
+french_encodings = [Vocab_fr.lookup_indices(sentence) for sentence in french_sentences]
 
 #%%
+import pickle as pl
+
+# Save the data
+with open('data/English_encodings.pkl', 'wb') as f:
+    pl.dump([english_encodings,english_sentences,Paddings_en,Vocab_en], f)
+with open('data/French_encodings.pkl', 'wb') as f:
+    pl.dump([french_encodings,french_sentences,Paddings_fr,Vocab_fr], f)
 
 
-with open('data/X.pickle','wb') as f:
-    pickle.dump([X_train,X_vali,X_test],f)
-with open('data/Y.pickle','wb') as f:
-    pickle.dump([Y_train,Y_vali,Y_test],f)
 
 
-#%%
-Vocab = vocab.build_vocab_from_iterator(english_sentences, min_freq = 1, special_first = True)
-Vocab_glove = vec_GloVe.get_vecs_by_tokens(vocab.get_itos())
 
-with open('data/Vocab_glove.pickle','wb') as f:
-    pickle.dump([Vocab,Vocab_glove],f) 
 
+
+
+# %%
