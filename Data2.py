@@ -2,7 +2,7 @@
 import torch as tn
 from torchtext import vocab
 import pickle as pl
-from Transformer import Transformer,src_mask,tgt_mask
+from Transformer_Builtin import Transformer,src_mask,tgt_mask
 from tqdm import tqdm
 import numpy as np
 
@@ -69,8 +69,11 @@ for batch in range(int(n_train/batch_size)):
 
 
 no_ahead_mask = tn.triu(tn.full((27,27),float('-inf')),diagonal=1)
-
-    
+#%%
+import torch as th
+X = th.tensor([1,1,2,2,3])
+Y = th.tensor([1,1,2,2,3])
+Model = Transformer(10,10,d_model=10,nhead=5)
 
 #%%
 loss_fn = tn.nn.CrossEntropyLoss()
