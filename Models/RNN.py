@@ -23,11 +23,9 @@ class GRUNet(nn.Module):
                           batch_first = True,
                           dropout = 0.1)
 
-        self.Decoder = nn.GRU(input_size = dim_input,
+        self.Decoder = nn.GRUCell(input_size = dim_input,
                           hidden_size = dim_recurrent,
-                          num_layers = num_sequence,
-                          batch_first = True,
-                          dropout = 0.1)
+                          )
 
 
         self.Forward = nn.Linear(in_features=dim_recurrent,out_features=tgt_vocab_size)
@@ -43,8 +41,7 @@ class GRUNet(nn.Module):
 
         # Get the last layer's last time step activation
         _, hidden = self.Encoder(input)
-
-        hidden= hidden.rep
+        
         
         output_decoder = tn.zeros(input.shape,device=device)
         hidden_decoder = tn.zeros((input.shape[0],self.num_sequence,hidden.shape[2]),device=device)
