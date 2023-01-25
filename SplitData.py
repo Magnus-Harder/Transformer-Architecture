@@ -80,3 +80,5 @@ with open('data/Validation_data.pkl', 'wb') as f:
 with open('data/Test_data.pkl', 'wb') as f:
     pl.dump([X_test,Y_test,src_key_masks_test],f)
 
+
+# %%
