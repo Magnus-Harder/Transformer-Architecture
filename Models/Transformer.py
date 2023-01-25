@@ -248,6 +248,8 @@ class Transformer(nn.Module):
         self.encoder = Encoder(T,d_model, nhead, d_ff, num_layers, dk, dv, dropout)
         self.decoder = Decoder(T,d_model, nhead, d_ff, num_layers, dk, dv, dropout)
 
+
+
     def forward(self, src, tgt, src_padding_mask=None, tgt_mask=None, tgt_padding_mask=None):
         
         # Get embedding and positional encoding for tgt and src
