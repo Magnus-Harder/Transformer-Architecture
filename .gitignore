@@ -6,6 +6,7 @@ __pycache__/
 # C extensions
 *.so
 
+
 # Distribution / packaging
 .Python
 build/
@@ -101,6 +102,9 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
+# PyTorch
+Models/Transformer.pt
+Models/RNN.pt
 
 # Environments
 .env
