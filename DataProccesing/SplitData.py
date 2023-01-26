@@ -15,12 +15,15 @@ with open('data/French_encodings.pkl', 'rb') as f:
 src_vocab_size = Vocab_fr.__len__()
 tgt_vocab_size = Vocab_en.__len__()
 
+
+# Set model_dimension
 d_model = 512
+
 # Define Train/test split and Masking
 X = th.tensor(french_encodings)
 Y = th.tensor(english_encodings)
 
-
+# Split the data
 n_train = 10000
 X_train = X[:n_train]
 Y_train = Y[:n_train]
@@ -44,9 +47,6 @@ for batch in range(int(n_train/batch_size)):
     Y_train_batches[batch] = Y_train[batch*batch_size:(batch+1)*batch_size]
 
 # Initialize the Mask tensors
-#src_mask_test = tn.zeros((int(n_train/batch_size),batch_size*8,27,27))
-#tgt_mask_test = tn.zeros((int(n_train/batch_size),batch_size*8,27,27))
-
 src_key_masks = th.ones((int(n_train/batch_size),batch_size,27,d_model))
 tgt_key_masks = th.ones((int(n_train/batch_size),batch_size,27,d_model))
 
@@ -71,6 +71,8 @@ src_key_masks_test = th.ones(len(X_test),27,d_model)
 for sample in range(len(X_test)):
     src_key_masks_test[sample][-Paddings_fr[sample+n_train+1+len(X_vali)]:] = 0
 
+
+# Save the data
 with open('data/Train_data.pkl', 'wb') as f:
     pl.dump([X_train_batches,Y_train_batches,src_key_masks,tgt_key_masks],f)
 

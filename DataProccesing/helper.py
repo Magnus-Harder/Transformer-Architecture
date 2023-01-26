@@ -1,6 +1,7 @@
+# Import os
 import os
 
-
+# Define function to load Data
 def load_data(path):
     """
     Load dataset

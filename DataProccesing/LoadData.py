@@ -1,7 +1,10 @@
 #%%
+# Import the libraries
 from helper import load_data
 from torchtext.data.utils import get_tokenizer
 from torchtext import vocab
+import pickle as pl
+
 # Load English data
 english_sentences = load_data('data/small_vocab_en')
 # Load French data
@@ -26,7 +29,6 @@ Vocab_fr = vocab.build_vocab_from_iterator(french_sentences + Transformer_predic
 
 # Max length of the sentences
 max_len = max([max([len(sentence) for sentence in english_sentences]),max([len(sentence) for sentence in french_sentences])]) + 2 # for Padding and End tokens
-
 
 # Create the list of padded sentences
 Paddings_en = []
@@ -54,20 +56,8 @@ for sentence_en,sentence_fr in zip(english_sentences,french_sentences):
 english_encodings = [Vocab_en.lookup_indices(sentence) for sentence in english_sentences]
 french_encodings = [Vocab_fr.lookup_indices(sentence) for sentence in french_sentences]
 
-#%%
-import pickle as pl
-
 # Save the data
 with open('data/English_encodings.pkl', 'wb') as f:
     pl.dump([english_encodings,english_sentences,Paddings_en,Vocab_en], f)
 with open('data/French_encodings.pkl', 'wb') as f:
     pl.dump([french_encodings,french_sentences,Paddings_fr,Vocab_fr], f)
-
-
-
-
-
-
-
-
-# %%
